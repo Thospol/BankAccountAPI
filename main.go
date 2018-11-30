@@ -1,11 +1,20 @@
 package main
 
 import (
+	"bankaccountapi/dao"
+	"bankaccountapi/model"
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
+	"github.com/globalsign/mgo/bson"
 	"github.com/gorilla/mux"
+)
+
+var (
+	//config = Config{}
+	daos = dao.UsersDAO{}
+	r    = mux.NewRouter()
 )
 
 func AllUserEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +26,18 @@ func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "CreateUserEndPoint !")
+	defer r.Body.Close()
+	var user model.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	user.ID = bson.NewObjectId()
+	if err := daos.Insert(user); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, user)
 }
 
 func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -29,13 +49,5 @@ func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/users", AllUserEndPoint).Methods("GET")
-	r.HandleFunc("/users", FindUserEndpoint).Methods("POST")
-	r.HandleFunc("/users", CreateUserEndPoint).Methods("PUT")
-	r.HandleFunc("/users", UpdateUserEndPoint).Methods("DELETE")
-	r.HandleFunc("/users/{id}", DeleteUserEndPoint).Methods("GET")
-	if err := http.ListenAndServe(":4525", r); err != nil {
-		log.Fatal(err)
-	}
+	InitRoute()
 }
