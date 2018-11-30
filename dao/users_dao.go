@@ -1,9 +1,11 @@
 package dao
 
 import (
+	"bankaccountapi/model"
 	"log"
 
 	mgo "github.com/globalsign/mgo"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UsersDAO struct {
@@ -23,4 +25,31 @@ func (m *UsersDAO) Connect() {
 		log.Fatal(err)
 	}
 	db = session.DB(m.Database)
+}
+
+func (u *UsersDAO) FindAll() ([]model.User, error) {
+	var users []model.User
+	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
+	return users, err
+}
+
+func (u *UsersDAO) FindById(id string) (model.User, error) {
+	var user model.User
+	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&user)
+	return user, err
+}
+
+func (u *UsersDAO) Insert(user model.User) error {
+	err := db.C(COLLECTION).Insert(&user)
+	return err
+}
+
+func (u *UsersDAO) Delete(user model.User) error {
+	err := db.C(COLLECTION).Remove(&user)
+	return err
+}
+
+func (u *UsersDAO) Update(user model.User) error {
+	err := db.C(COLLECTION).UpdateId(user.ID, &user)
+	return err
 }
