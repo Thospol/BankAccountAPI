@@ -47,10 +47,12 @@ func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	user, err := daos.FindById(params["id"])
+
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
 		return
 	}
+
 	respondWithJson(w, http.StatusOK, user)
 }
 
@@ -107,4 +109,33 @@ func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func CreateBankAccountEndPoint(w http.ResponseWriter, r *http.Request) {
+
+	defer r.Body.Close()
+
+	var bankAccout model.BankAccout
+
+	params := mux.Vars(r)
+	user, err := daos.FindById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&bankAccout); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	bankAccout.ID = bson.NewObjectId()
+	bankAccout.UserID = string(user.ID)
+	if err := daos.InsertBankAccount(bankAccout); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusCreated, user)
+
 }
