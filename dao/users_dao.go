@@ -5,7 +5,7 @@ import (
 	"log"
 
 	mgo "github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type UsersDAO struct {
