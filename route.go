@@ -11,7 +11,7 @@ func InitRoute() {
 	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")
 	r.HandleFunc("/users", UpdateUserEndPoint).Methods("PUT")
 	r.HandleFunc("/users", DeleteUserEndPoint).Methods("DELETE")
-
+	r.HandleFunc("/user/{id}/bankAccount", CreateBankAccountEndPoint).Methods("POST")
 	if err := http.ListenAndServe(":4525", r); err != nil {
 		log.Fatal(err)
 	}

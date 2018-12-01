@@ -11,7 +11,7 @@ type User struct {
 
 type BankAccout struct {
 	ID            bson.ObjectId `bson:"_id" json:"id"`
-	UserID        string        `bson:"user_id" json:"user_id"`
+	UserID        bson.ObjectId `bson:"user_id" json:"user_id"`
 	AccountNumber string        `bson:"account_number" json:"account_number"`
 	Balance       float64       `bson:"balance" json:"balance"`
 }

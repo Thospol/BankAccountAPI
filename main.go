@@ -130,7 +130,7 @@ func CreateBankAccountEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bankAccout.ID = bson.NewObjectId()
-	bankAccout.UserID = string(user.ID)
+	bankAccout.UserID = user.ID
 	if err := daos.InsertBankAccount(bankAccout); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
