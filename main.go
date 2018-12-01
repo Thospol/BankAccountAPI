@@ -128,20 +128,17 @@ func CreateBankAccountOfUserEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-
-	user.BankAccount = []model.BankAccout{
-		{
-			ID:            bson.NewObjectId(),
-			UserID:        user.ID,
-			AccountNumber: user.BankAccount[0].AccountNumber,
-			Balance:       user.BankAccount[0].Balance,
-		},
-	}
-
-	if err := daos.Update(user); err != nil {
+	// user.BankAccount = []model.BankAccout{
+	// 	{
+	// 		ID:     bson.NewObjectId(),
+	// 		UserID: user.ID,
+	// 		//AccountNumber: user.BankAccount[0].AccountNumber,
+	// 		//Balance:       user.BankAccount[0].Baslance,
+	// 	},
+	// }
+	if err := daos.InsertBankOfAcount(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	respondWithJson(w, http.StatusCreated, user)
 }
