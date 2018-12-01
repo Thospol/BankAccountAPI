@@ -19,6 +19,11 @@ func (u *UsersDAO) InsertBankAccount(bankaccount model.BankAccout) error {
 	fmt.Printf("%#v\n", bankaccount)
 	return err
 }
+func (u *UsersDAO) UpdateBankAccountOfUser(bankaccount model.BankAccout) error {
+	err := db.C(COLLECTION).UpdateId(bankaccount.UserID, &bankaccount)
+	fmt.Printf("%#v\n", bankaccount)
+	return err
+}
 
 func (u *UsersDAO) DeleteBankAccount(bankaccount model.BankAccout) error {
 	err := db.C(COLLECTION).Remove(&bankaccount)
