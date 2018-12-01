@@ -6,12 +6,12 @@ import (
 )
 
 func InitRoute() {
-	r.HandleFunc("/users", AllUserEndPoint).Methods("GET")
-	r.HandleFunc("/users/{id}", FindUserEndpoint).Methods("GET")
-	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")
-	r.HandleFunc("/users", UpdateUserEndPoint).Methods("PUT")
-	r.HandleFunc("/users", DeleteUserEndPoint).Methods("DELETE")
-	r.HandleFunc("/user/{id}/bankAccount", CreateBankAccountEndPoint).Methods("POST")
+	r.HandleFunc("api/users", AllUserEndPoint).Methods("GET")
+	r.HandleFunc("api/users/{id}", FindUserEndpoint).Methods("GET")
+	r.HandleFunc("api/users", CreateUserEndPoint).Methods("POST")
+	r.HandleFunc("api/users", UpdateUserEndPoint).Methods("PUT")
+	r.HandleFunc("api/users", DeleteUserEndPoint).Methods("DELETE")
+	r.HandleFunc("api/user/{id}/bankAccount", CreateBankAccountEndPoint).Methods("POST")
 	if err := http.ListenAndServe(":4525", r); err != nil {
 		log.Fatal(err)
 	}
