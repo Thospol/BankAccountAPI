@@ -65,8 +65,9 @@ func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-
 	user.ID = bson.NewObjectId()
+	fmt.Println("Create New User : ", user)
+
 	if err := daos.Insert(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -115,30 +116,30 @@ func CreateBankAccountOfUserEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	var user model.User
+	var userBankAcc model.BankAccout
 	params := mux.Vars(r)
-	user, err := daos.FindById(params["id"])
 
+	user, err := daos.FindById(params["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&userBankAcc); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	// user.BankAccount = []model.BankAccout{
-	// 	{
-	// 		ID:     bson.NewObjectId(),
-	// 		UserID: user.ID,
-	// 		//AccountNumber: user.BankAccount[0].AccountNumber,
-	// 		//Balance:       user.BankAccount[0].Baslance,
-	// 	},
-	// }
-	if err := daos.InsertBankOfAcount(user); err != nil {
+	fmt.Println("userBankAcc :", userBankAcc)
+
+	userBankAcc.ID = bson.NewObjectId()
+	userBankAcc.UserID = user.ID
+
+	user.BankAccount = append(user.BankAccount, userBankAcc)
+
+	if err := daos.Update(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, user)
+
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
