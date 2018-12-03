@@ -28,7 +28,7 @@ func init() {
 }
 
 func main() {
-	InitRoute()
+	SetupRoute()
 }
 
 func AllUserEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -135,6 +135,36 @@ func CreateBankAccountOfUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	userBankAcc.UserID = user.ID
 
 	user.BankAccount = append(user.BankAccount, userBankAcc)
+
+	if err := daos.Update(user); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func DeleteBankAccountOfUsersEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	params := mux.Vars(r)
+	user, err := daos.FindById(params["id"])
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+
+	for _, element := range user.BankAccount {
+		if element.ID == bson.ObjectIdHex(params["idAccount"]) {
+			fmt.Println("Delete BankAccount.ID =", element.ID)
+		} else {
+			//user.BankAccount = user
+			user.BankAccount = append(user.BankAccount, element)
+			//ยังต้องแก้น้ะครับ
+		}
+
+	}
 
 	if err := daos.Update(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
